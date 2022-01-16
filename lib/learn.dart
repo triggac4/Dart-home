@@ -3,8 +3,14 @@ import 'package:testing/volcabulary_container.dart';
 import 'button.dart';
 import 'recommended_conponents.dart';
 
+typedef Recommended = Map<String, String>;
+
 class Learn extends StatefulWidget {
-  const Learn({Key? key}) : super(key: key);
+  final List<Recommended> recommendedComp;
+  final Function(Recommended) pageChanger;
+  const Learn(
+      {Key? key, required this.recommendedComp, required this.pageChanger})
+      : super(key: key);
 
   @override
   _LearnState createState() => _LearnState();
@@ -21,17 +27,6 @@ class _LearnState extends State<Learn> {
   ];
 
   int selected = 0;
-
-  final List<Map<String, String>> recommendedComp = [
-    {'Chatting': '5 minutes'},
-    {'Listen': '5 minutes'},
-    {'Speak': '3 minutes'},
-    {'Exercise': '30 minutes'},
-    {'Eating': '10 minutes'},
-    {'Video Games': '30 minutes'},
-  ];
-
-  List<int> recommendedSelected = [0];
 
   onCategorySelect(int index) {
     setState(() {
@@ -78,15 +73,15 @@ class _LearnState extends State<Learn> {
               Expanded(
                 child: ListView.builder(
                   itemBuilder: (ctx, i) {
-                    var rec = recommendedComp[i];
-                    bool isSelected = recommendedSelected.contains(i);
+                    var rec = widget.recommendedComp[i];
                     return RecommendedComponent(
                         activity: rec.keys.toList()[0],
                         icon: const Icon(Icons.local_activity),
-                        isSelected: isSelected,
+                        isSelected: true,
+                        onSelect: () => widget.pageChanger(rec),
                         time: rec.values.toList()[0]);
                   },
-                  itemCount: recommendedComp.length,
+                  itemCount: widget.recommendedComp.length,
                 ),
               )
             ],
