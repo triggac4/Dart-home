@@ -7,6 +7,7 @@ import 'package:testing/recommended_conponents.dart';
 import './learn.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp(title: "Calculator"));
 }
 
@@ -33,7 +34,7 @@ class LearnRouteInfo extends RouteInformationParser<LearnPageController> {
     if (location != null) {
       var uri = Uri.parse(location);
 
-      if (uri.pathSegments.length == 1) {
+      if (uri.pathSegments.length == 0) {
         return LearnPageController.home();
       }
       //detail/id:
@@ -89,7 +90,9 @@ class LearnRouteDelegate extends RouterDelegate<LearnPageController>
                   recommendedComp: recommendedCompe,
                   pageChanger: _handlePageChange)),
           if (show404)
-            const MaterialPage(child: Center(child: Text('unknown route')))
+            const MaterialPage(
+                child: Center(child: Text('unknown route')),
+                key: ValueKey('unknown'))
           else if (recommendedSelected != null)
             DetailsScreen(recommend: recommendedSelected!)
         ],
@@ -101,7 +104,7 @@ class LearnRouteDelegate extends RouterDelegate<LearnPageController>
             notifyListeners();
             return false;
           }
-
+          print(result);
           recommendedSelected = null;
           show404 = false;
           notifyListeners();
@@ -116,19 +119,20 @@ class LearnRouteDelegate extends RouterDelegate<LearnPageController>
   }
 
   @override
-  Future<void> setNewRoutePath(LearnPageController configuration) {
+  Future<void> setNewRoutePath(LearnPageController configuration) async {
     if (configuration.isUnknown) {
       show404 = true;
-      return Future.value();
+      return;
     } else if (configuration.isDetail) {
       show404 = false;
       recommendedSelected = recommendedCompe.firstWhere(
           (element) => element.keys.toList()[0] == configuration.id);
-      return Future.value();
+      return;
+    } else {
+      recommendedSelected = null;
+      show404 = false;
+      return;
     }
-    recommendedSelected = null;
-    show404 = false;
-    return Future.value();
   }
 }
 
